@@ -1,0 +1,5 @@
+{
+  "note": "This file is the seed schema reference. Live data is stored in localStorage via Zustand persist middleware (key: personal-os-store). To export a snapshot of live data, use the Export button in the dashboard.",
+  "version": "1.0",
+  "lastUpdated": "2026-03-15"
+}
