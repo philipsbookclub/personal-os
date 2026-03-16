@@ -722,9 +722,9 @@ def get_work_reports():
 @app.post("/b1/reports/generate")
 def generate_work_report():
     logs = query(
-        """SELECT mode, energy, hours_logged, applications_submitted, producer_interactions, value_created
+        """SELECT date, text, mode, energy, hours_logged, applications_submitted, producer_interactions, value_created
            FROM work_logs ORDER BY date DESC LIMIT 7"""
-    )
+    ) or []
     todos_done = query("SELECT text FROM todos WHERE done=TRUE")
     todos_open = query("SELECT priority, text FROM todos WHERE done=FALSE")
     month = query(
@@ -733,19 +733,30 @@ def generate_work_report():
 
     mode_breakdown = {}
     for r in logs:
-        if r[0]:
-            mode_breakdown[r[0]] = mode_breakdown.get(r[0], 0) + 1
+        if r[2]:
+            mode_breakdown[r[2]] = mode_breakdown.get(r[2], 0) + 1
 
-    avg_energy = round(sum(r[1] or 7 for r in logs) / max(len(logs), 1), 1)
-    total_hours = sum(r[2] or 0 for r in logs)
-    total_apps = sum(r[3] or 0 for r in logs)
-    total_producers = sum(r[4] or 0 for r in logs)
-    value_notes = [r[5] for r in logs if r[5]]
+    avg_energy = round(sum(r[3] or 7 for r in logs) / max(len(logs), 1), 1)
+    total_hours = sum(r[4] or 0 for r in logs)
+    total_apps = sum(r[5] or 0 for r in logs)
+    total_producers = sum(r[6] or 0 for r in logs)
+    value_notes = [r[7] for r in logs if r[7]]
+
+    log_entries_text = '\n'.join(
+        f"  [{r[0]}] mode={r[2] or '?'} energy={r[3] or '?'}/10 hours={r[4] or '?'}h"
+        + (f"\n    Notes: {r[1]}" if r[1] else "")
+        + (f"\n    Value created: {r[7]}" if r[7] else "")
+        for r in logs
+    ) or "  (no entries this week)"
 
     prompt = f"""Generate the weekly Work (UGOA) report for Philip.
 
 THIS WEEK'S DATA:
-- Daily log entries: {len(logs)}
+
+Daily logs ({len(logs)} entries):
+{log_entries_text}
+
+Aggregates:
 - Work mode breakdown: {json.dumps(mode_breakdown)}
 - Completed tasks: {'; '.join(r[0] for r in todos_done) or 'none logged'}
 - Open tasks: {'; '.join(f'[{r[0]}] {r[1]}' for r in todos_open)}
@@ -753,7 +764,8 @@ THIS WEEK'S DATA:
 - Total hours logged: {total_hours}h
 - Applications submitted: {total_apps}
 - Producer interactions: {total_producers}
-- Value created: {'; '.join(value_notes) or 'not quantified'}
+
+Instruction: Base your analysis primarily on the daily log notes above. If value_created fields are sparse, draw insights from the raw notes instead — what was worked on, what progress was made, what patterns appear across days.
 
 MONTH CONTEXT:
 - Theme: {month[0] if month else 'not set'}
