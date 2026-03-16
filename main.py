@@ -343,9 +343,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Personal OS API", version="1.0.0", lifespan=lifespan)
 
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://philipsbookclub.github.io",
+    os.getenv("FRONTEND_URL", ""),   # set this in Railway if using Vercel
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=[o for o in ALLOWED_ORIGINS if o],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
