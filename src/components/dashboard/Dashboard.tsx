@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../../lib/api'
 
 const BUCKETS = [
@@ -60,10 +61,10 @@ export default function Dashboard() {
 
       <div className="bucket-grid">
         {BUCKETS.map(b => (
-          <a key={b.id} href={b.path} className="card bucket-card">
+          <Link key={b.id} to={b.path} className="card bucket-card">
             <div className="bucket-card-icon">{b.icon}</div>
             <div className="bucket-card-label">{b.label}</div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>
