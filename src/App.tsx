@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { HashRouter, Routes, Route, NavLink } from 'react-router-dom'
 import Dashboard        from './components/dashboard/Dashboard'
 import CrossBucketPanel from './components/dashboard/CrossBucketPanel'
 import PrepView         from './components/planning/PrepView'
@@ -105,7 +105,7 @@ export default function App() {
   const [mobileSynthOpen, setMobileSynthOpen] = useState(false)
 
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <div className={`app-layout${panelOpen ? ' panel-open' : ' panel-closed'}`}>
         <Sidebar />
         <MobileHeader onSynthesis={() => setMobileSynthOpen(v => !v)} />
@@ -142,6 +142,6 @@ export default function App() {
 
         <BottomNav />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
