@@ -13,9 +13,12 @@ function AddIdea({ onAdded }: { onAdded: () => void }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b7.ideas.add(form)
-    setForm(f => ({ ...f, title: '', description: '' }))
-    setShow(false); onAdded(); setSubmitting(false)
+    try {
+      await api.b7.ideas.add(form)
+      setForm(f => ({ ...f, title: '', description: '' }))
+      setShow(false); onAdded()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   if (!show) return <button className="btn btn-primary" onClick={() => setShow(true)}>+ Capture Idea</button>

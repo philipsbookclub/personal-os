@@ -16,8 +16,11 @@ function FitnessLog() {
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b3.logs.add({ ...form, durationMinutes: form.durationMinutes ? parseInt(form.durationMinutes) : null, sleepQuality: form.sleepQuality ? parseInt(form.sleepQuality) : null, weight: form.weight ? parseFloat(form.weight) : null })
-    load(); setSubmitting(false)
+    try {
+      await api.b3.logs.add({ ...form, durationMinutes: form.durationMinutes ? parseInt(form.durationMinutes) : null, sleepQuality: form.sleepQuality ? parseInt(form.sleepQuality) : null, weight: form.weight ? parseFloat(form.weight) : null })
+      load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   return (
@@ -67,9 +70,12 @@ function TennisLog() {
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b3.tennis.add(form)
-    setForm(f => ({ ...f, opponentName: '', score: '', skillFocus: '', notes: '' }))
-    load(); setSubmitting(false)
+    try {
+      await api.b3.tennis.add(form)
+      setForm(f => ({ ...f, opponentName: '', score: '', skillFocus: '', notes: '' }))
+      load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   const wins = matches.filter(m => m.result === 'win').length

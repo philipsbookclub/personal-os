@@ -74,9 +74,12 @@ function DailyLog() {
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b1.logs.add({ ...form, hoursLogged: form.hoursLogged ? parseFloat(form.hoursLogged as string) : null, mode: form.mode || null })
-    setForm(f => ({ ...f, text: '', valueCreated: '', hoursLogged: '' }))
-    load(); setSubmitting(false)
+    try {
+      await api.b1.logs.add({ ...form, hoursLogged: form.hoursLogged ? parseFloat(form.hoursLogged as string) : null, mode: form.mode || null })
+      setForm(f => ({ ...f, text: '', valueCreated: '', hoursLogged: '' }))
+      load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   return (

@@ -38,6 +38,7 @@ def put_conn(conn):
 
 def query(sql: str, params=None, fetch: str = "all"):
     conn = get_conn()
+    cur = None
     try:
         cur = conn.cursor()
         cur.execute(sql, params)
@@ -47,12 +48,39 @@ def query(sql: str, params=None, fetch: str = "all"):
         if fetch == "all":
             return cur.fetchall()
         return None
+    except psycopg2.OperationalError:
+        # Stale Neon connection — discard it and retry once with a fresh connection
+        if cur:
+            try: cur.close()
+            except: pass
+        try:
+            if pool: pool.putconn(conn, close=True)
+        except: pass
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, params)
+            conn.commit()
+            if fetch == "one":
+                return cur.fetchone()
+            if fetch == "all":
+                return cur.fetchall()
+            return None
+        except Exception as e2:
+            conn.rollback()
+            raise e2
+        finally:
+            cur.close()
+            conn.close()
     except Exception as e:
         conn.rollback()
         raise e
     finally:
-        cur.close()
-        put_conn(conn)
+        if cur:
+            try: cur.close()
+            except: pass
+        try: put_conn(conn)
+        except: pass  # already closed in retry branch
 
 
 def row_to_dict(row, cols):

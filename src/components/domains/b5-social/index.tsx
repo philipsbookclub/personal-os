@@ -14,9 +14,12 @@ function DailyLog() {
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b5.logs.add({ ...form, momentumScore: form.momentumScore ? parseInt(form.momentumScore) : null, videosPosted: 0, views: 0, followersGained: 0 })
-    setForm(f => ({ ...f, notes: '', momentumScore: '' }))
-    load(); setSubmitting(false)
+    try {
+      await api.b5.logs.add({ ...form, momentumScore: form.momentumScore ? parseInt(form.momentumScore) : null, videosPosted: 0, views: 0, followersGained: 0 })
+      setForm(f => ({ ...f, notes: '', momentumScore: '' }))
+      load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   return (
@@ -69,9 +72,12 @@ function JobTracker() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b5.jobs.add(form)
-    setForm(f => ({ ...f, company: '', role: '', notes: '' }))
-    load(); setSubmitting(false)
+    try {
+      await api.b5.jobs.add(form)
+      setForm(f => ({ ...f, company: '', role: '', notes: '' }))
+      load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
   const updateStatus = async (id: string, status: string) => { await api.b5.jobs.status(id, status); load() }
 

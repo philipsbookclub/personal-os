@@ -12,8 +12,11 @@ function AddInteractionModal({ contactId, onClose, onSaved }: { contactId: strin
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b6.interaction(contactId, form)
-    onSaved(); onClose()
+    try {
+      await api.b6.interaction(contactId, form)
+      onSaved(); onClose()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   return (
@@ -81,9 +84,12 @@ function ContactList() {
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b6.contacts.add({ ...form, category: form.category || null })
-    setForm(f => ({ ...f, name: '', whereMet: '', notes: '' }))
-    setShowAdd(false); load(); setSubmitting(false)
+    try {
+      await api.b6.contacts.add({ ...form, category: form.category || null })
+      setForm(f => ({ ...f, name: '', whereMet: '', notes: '' }))
+      setShowAdd(false); load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   const twoWeeksAgo = new Date(Date.now() - 14 * 86400000).toISOString().slice(0, 10)

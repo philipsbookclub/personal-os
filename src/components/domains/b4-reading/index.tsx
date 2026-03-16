@@ -13,9 +13,12 @@ function Books() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b4.books.add({ ...form, totalPages: form.totalPages ? parseInt(form.totalPages) : null })
-    setForm(f => ({ ...f, title: '', author: '' }))
-    load(); setSubmitting(false)
+    try {
+      await api.b4.books.add({ ...form, totalPages: form.totalPages ? parseInt(form.totalPages) : null })
+      setForm(f => ({ ...f, title: '', author: '' }))
+      load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   const complete = async (id: string) => { await api.b4.books.complete(id); load() }
@@ -85,9 +88,12 @@ function DailyLog() {
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
-    await api.b4.logs.add({ ...form, pagesRead: form.pagesRead ? parseInt(form.pagesRead) : null, bookId: form.bookId || null })
-    setForm(f => ({ ...f, keyTakeaway: '', quote: '', appliedTo: '', pagesRead: '' }))
-    load(); setSubmitting(false)
+    try {
+      await api.b4.logs.add({ ...form, pagesRead: form.pagesRead ? parseInt(form.pagesRead) : null, bookId: form.bookId || null })
+      setForm(f => ({ ...f, keyTakeaway: '', quote: '', appliedTo: '', pagesRead: '' }))
+      load()
+    } catch { alert('Save failed — please try again') }
+    finally { setSubmitting(false) }
   }
 
   return (
