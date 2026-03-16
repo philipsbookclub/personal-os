@@ -17,7 +17,7 @@ function Books() {
       await api.b4.books.add({ ...form, totalPages: form.totalPages ? parseInt(form.totalPages) : null })
       setForm(f => ({ ...f, title: '', author: '' }))
       load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 
@@ -92,7 +92,7 @@ function DailyLog() {
       await api.b4.logs.add({ ...form, pagesRead: form.pagesRead ? parseInt(form.pagesRead) : null, bookId: form.bookId || null })
       setForm(f => ({ ...f, keyTakeaway: '', quote: '', appliedTo: '', pagesRead: '' }))
       load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 

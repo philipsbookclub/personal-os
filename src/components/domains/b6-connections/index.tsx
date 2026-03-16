@@ -15,7 +15,7 @@ function AddInteractionModal({ contactId, onClose, onSaved }: { contactId: strin
     try {
       await api.b6.interaction(contactId, form)
       onSaved(); onClose()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 
@@ -88,7 +88,7 @@ function ContactList() {
       await api.b6.contacts.add({ ...form, category: form.category || null })
       setForm(f => ({ ...f, name: '', whereMet: '', notes: '' }))
       setShowAdd(false); load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 

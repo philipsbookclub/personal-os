@@ -17,7 +17,7 @@ function AddIdea({ onAdded }: { onAdded: () => void }) {
       await api.b7.ideas.add(form)
       setForm(f => ({ ...f, title: '', description: '' }))
       setShow(false); onAdded()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 

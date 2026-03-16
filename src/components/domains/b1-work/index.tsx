@@ -78,7 +78,7 @@ function DailyLog() {
       await api.b1.logs.add({ ...form, hoursLogged: form.hoursLogged ? parseFloat(form.hoursLogged as string) : null, mode: form.mode || null })
       setForm(f => ({ ...f, text: '', valueCreated: '', hoursLogged: '' }))
       load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 

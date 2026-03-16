@@ -18,7 +18,7 @@ function DailyLog() {
       await api.b2.logs.add({ ...form, hoursLogged: form.hoursLogged ? parseFloat(form.hoursLogged) : null, aiLearningHours: form.aiLearningHours ? parseFloat(form.aiLearningHours) : null, coFounderAlignment: form.coFounderAlignment ? parseInt(form.coFounderAlignment) : null, mode: form.mode || null })
       setForm(f => ({ ...f, text: '', milestoneUpdate: '', blockers: '', keyDecision: '', aiInsight: '', aiTopic: '' }))
       load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 
@@ -89,7 +89,7 @@ function Milestones() {
       await api.b2.milestones.add(form)
       setForm(f => ({ ...f, title: '', notes: '' }))
       load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 

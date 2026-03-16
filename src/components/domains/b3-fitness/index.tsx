@@ -19,7 +19,7 @@ function FitnessLog() {
     try {
       await api.b3.logs.add({ ...form, durationMinutes: form.durationMinutes ? parseInt(form.durationMinutes) : null, sleepQuality: form.sleepQuality ? parseInt(form.sleepQuality) : null, weight: form.weight ? parseFloat(form.weight) : null })
       load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 
@@ -74,7 +74,7 @@ function TennisLog() {
       await api.b3.tennis.add(form)
       setForm(f => ({ ...f, opponentName: '', score: '', skillFocus: '', notes: '' }))
       load()
-    } catch { alert('Save failed — please try again') }
+    } catch (err) { console.error('Save error:', err); alert('Save failed: ' + (err instanceof Error ? err.message : String(err))) }
     finally { setSubmitting(false) }
   }
 
