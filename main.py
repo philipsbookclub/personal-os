@@ -21,9 +21,6 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-print(f"[startup] DATABASE_URL set: {bool(DATABASE_URL)}")
-print(f"[startup] ANTHROPIC_API_KEY set: {bool(ANTHROPIC_API_KEY)}")
-print(f"[startup] All env keys: {[k for k in os.environ.keys() if 'URL' in k or 'KEY' in k or 'PORT' in k]}")
 MODEL = "claude-sonnet-4-20250514"
 
 # ── Connection pool ─────────────────────────────────────────────────────────
