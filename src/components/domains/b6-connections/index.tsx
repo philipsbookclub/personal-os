@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../lib/api'
+import { useDictation } from '../../../hooks/useDictation'
 
 const BUCKET_OPTS = ['serendipity', 'social', 'both']
 const CATEGORIES = ['personal', 'business', 'creative', 'mentor']
@@ -9,6 +10,9 @@ const INTERACTION_TYPES = ['hangout', 'call-video', 'text-dm', 'event', 'busines
 function AddInteractionModal({ contactId, onClose, onSaved }: { contactId: string; onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState({ type: 'hangout', date: new Date().toISOString().slice(0, 10), note: '' })
   const [submitting, setSubmitting] = useState(false)
+  const { listening: dictating, toggle: toggleDictation } = useDictation(
+    t => setForm(f => ({ ...f, note: f.note + (f.note ? ' ' : '') + t }))
+  )
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
@@ -32,7 +36,13 @@ function AddInteractionModal({ contactId, onClose, onSaved }: { contactId: strin
             </div>
             <div className="form-group"><label>Date</label><input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} /></div>
           </div>
-          <div className="form-group"><label>Note</label><textarea value={form.note} onChange={e => setForm(f => ({ ...f, note: e.target.value }))} placeholder="What happened?" /></div>
+          <div className="form-group">
+            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              Note
+              <button type="button" onClick={toggleDictation} title={dictating ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictating ? 'var(--red, #ef4444)' : 'inherit', opacity: dictating ? 1 : 0.5 }}>{dictating ? '⏹ stop' : '🎤'}</button>
+            </label>
+            <textarea value={form.note} onChange={e => setForm(f => ({ ...f, note: e.target.value }))} placeholder="What happened?" />
+          </div>
           <button className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving…' : 'Save'}</button>
         </form>
       </div>
@@ -82,6 +92,9 @@ function ContactList() {
   useEffect(() => { load() }, [])
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const { listening: dictatingContact, toggle: toggleContactDictation } = useDictation(
+    t => setForm(f => ({ ...f, notes: f.notes + (f.notes ? ' ' : '') + t }))
+  )
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
     try {
@@ -125,7 +138,13 @@ function ContactList() {
               <div className="form-group"><label>Category</label><select value={form.category} onChange={e => set('category', e.target.value)}><option value="">—</option>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
               <div className="form-group"><label>Status</label><select value={form.status} onChange={e => set('status', e.target.value)}>{STATUSES.map(s => <option key={s}>{s}</option>)}</select></div>
             </div>
-            <div className="form-group"><label>Notes</label><textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="First impression, context…" /></div>
+            <div className="form-group">
+              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Notes
+                <button type="button" onClick={toggleContactDictation} title={dictatingContact ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictatingContact ? 'var(--red, #ef4444)' : 'inherit', opacity: dictatingContact ? 1 : 0.5 }}>{dictatingContact ? '⏹ stop' : '🎤'}</button>
+              </label>
+              <textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="First impression, context…" />
+            </div>
             <button className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving…' : 'Add Contact'}</button>
           </form>
         </div>

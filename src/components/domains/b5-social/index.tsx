@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../lib/api'
+import { useDictation } from '../../../hooks/useDictation'
 
 const STATUSES = ['applied', 'response', 'interview', 'offer', 'rejected', 'withdrawn']
 
@@ -12,6 +13,9 @@ function DailyLog() {
   useEffect(() => { load() }, [])
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const { listening: dictating, toggle: toggleDictation } = useDictation(
+    t => setForm(f => ({ ...f, notes: f.notes + (f.notes ? ' ' : '') + t }))
+  )
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
     try {
@@ -43,7 +47,13 @@ function DailyLog() {
           <div className="form-group"><label>Events Attended</label><input type="number" value={form.eventsAttended} onChange={e => set('eventsAttended', +e.target.value)} min={0} /></div>
           <div className="form-group"><label>Momentum (1–5)</label><input type="number" value={form.momentumScore} onChange={e => set('momentumScore', e.target.value)} min={1} max={5} /></div>
         </div>
-        <div className="form-group"><label>Notes</label><textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="What happened today?" /></div>
+        <div className="form-group">
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Notes
+            <button type="button" onClick={toggleDictation} title={dictating ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictating ? 'var(--red, #ef4444)' : 'inherit', opacity: dictating ? 1 : 0.5 }}>{dictating ? '⏹ stop' : '🎤'}</button>
+          </label>
+          <textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="What happened today?" />
+        </div>
         <button className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving…' : 'Save Log'}</button>
       </form>
       <div className="mt-lg">

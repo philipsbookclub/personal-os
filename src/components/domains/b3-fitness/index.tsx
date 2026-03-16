@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../lib/api'
+import { useDictation } from '../../../hooks/useDictation'
 
 const WORKOUT_TYPES = ['strength', 'cardio', 'mobility', 'tennis']
 const SURFACES = ['hard', 'clay', 'grass']
@@ -14,6 +15,9 @@ function FitnessLog() {
   useEffect(() => { load() }, [])
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const { listening: dictating, toggle: toggleDictation } = useDictation(
+    t => setForm(f => ({ ...f, notes: f.notes + (f.notes ? ' ' : '') + t }))
+  )
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
     try {
@@ -41,7 +45,13 @@ function FitnessLog() {
           <div className="form-group"><label>Sleep Quality (1–10)</label><input type="number" value={form.sleepQuality} onChange={e => set('sleepQuality', e.target.value)} min={1} max={10} /></div>
           <div className="form-group"><label>Weight (lbs)</label><input type="number" value={form.weight} onChange={e => set('weight', e.target.value)} step={0.1} /></div>
         </div>
-        <div className="form-group"><label>Notes</label><textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="How did it feel?" /></div>
+        <div className="form-group">
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Notes
+            <button type="button" onClick={toggleDictation} title={dictating ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictating ? 'var(--red, #ef4444)' : 'inherit', opacity: dictating ? 1 : 0.5 }}>{dictating ? '⏹ stop' : '🎤'}</button>
+          </label>
+          <textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="How did it feel?" />
+        </div>
         <button className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving…' : 'Save'}</button>
       </form>
       <div className="mt-lg">
@@ -68,6 +78,9 @@ function TennisLog() {
   useEffect(() => { load() }, [])
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const { listening: dictatingTennis, toggle: toggleTennisDictation } = useDictation(
+    t => setForm(f => ({ ...f, notes: f.notes + (f.notes ? ' ' : '') + t }))
+  )
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
     try {
@@ -105,7 +118,13 @@ function TennisLog() {
           <div className="form-group"><label>Type</label><select value={form.matchType} onChange={e => set('matchType', e.target.value)}>{MATCH_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
           <div className="form-group"><label>Skill Focus</label><input value={form.skillFocus} onChange={e => set('skillFocus', e.target.value)} placeholder="e.g. serve kick" /></div>
         </div>
-        <div className="form-group"><label>Notes</label><textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Tactics, observations…" /></div>
+        <div className="form-group">
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Notes
+            <button type="button" onClick={toggleTennisDictation} title={dictatingTennis ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictatingTennis ? 'var(--red, #ef4444)' : 'inherit', opacity: dictatingTennis ? 1 : 0.5 }}>{dictatingTennis ? '⏹ stop' : '🎤'}</button>
+          </label>
+          <textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Tactics, observations…" />
+        </div>
         <button className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving…' : 'Log Match'}</button>
       </form>
       <div className="mt-lg">

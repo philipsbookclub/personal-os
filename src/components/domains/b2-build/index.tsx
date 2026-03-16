@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../lib/api'
+import { useDictation } from '../../../hooks/useDictation'
 
 const BUILD_MODES = ['product', 'strategy', 'outreach', 'fundraising']
 
@@ -12,6 +13,9 @@ function DailyLog() {
   useEffect(() => { load() }, [])
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const { listening: dictating, toggle: toggleDictation } = useDictation(
+    t => setForm(f => ({ ...f, text: f.text + (f.text ? ' ' : '') + t }))
+  )
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
     try {
@@ -37,7 +41,13 @@ function DailyLog() {
           <div className="form-group"><label>Hours</label><input type="number" value={form.hoursLogged} onChange={e => set('hoursLogged', e.target.value)} placeholder="0" step={0.5} /></div>
           <div className="form-group"><label>Mentors Contacted</label><input type="number" value={form.mentorsContacted} onChange={e => set('mentorsContacted', +e.target.value)} min={0} /></div>
         </div>
-        <div className="form-group"><label>Log</label><textarea value={form.text} onChange={e => set('text', e.target.value)} placeholder="What happened on Magister today…" required /></div>
+        <div className="form-group">
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Log
+            <button type="button" onClick={toggleDictation} title={dictating ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictating ? 'var(--red, #ef4444)' : 'inherit', opacity: dictating ? 1 : 0.5 }}>{dictating ? '⏹ stop' : '🎤'}</button>
+          </label>
+          <textarea value={form.text} onChange={e => set('text', e.target.value)} placeholder="What happened on Magister today…" required />
+        </div>
         <div className="form-row">
           <div className="form-group"><label>Milestone Update</label><input value={form.milestoneUpdate} onChange={e => set('milestoneUpdate', e.target.value)} placeholder="Progress…" /></div>
           <div className="form-group"><label>Co-founder Alignment (1–5)</label><input type="number" value={form.coFounderAlignment} onChange={e => set('coFounderAlignment', e.target.value)} min={1} max={5} /></div>

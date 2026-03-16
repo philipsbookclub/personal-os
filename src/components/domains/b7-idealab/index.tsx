@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../lib/api'
+import { useDictation } from '../../../hooks/useDictation'
 
 const ORIGINS = ['shower', 'reading', 'conversation', 'serendipity', 'work', 'other']
 const CATEGORIES = ['business', 'product', 'creative', 'personal', 'other']
@@ -10,6 +11,9 @@ function AddIdea({ onAdded }: { onAdded: () => void }) {
   const [show, setShow] = useState(false)
   const [form, setForm] = useState({ title: '', description: '', capturedAt: new Date().toISOString().slice(0, 10), origin: 'other', category: 'other', stage: 'spark' })
   const [submitting, setSubmitting] = useState(false)
+  const { listening: dictating, toggle: toggleDictation } = useDictation(
+    t => setForm(f => ({ ...f, description: f.description + (f.description ? ' ' : '') + t }))
+  )
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
@@ -28,7 +32,13 @@ function AddIdea({ onAdded }: { onAdded: () => void }) {
       <div className="flex-between mb-md"><h3>Capture Idea</h3><button className="btn btn-ghost btn-sm" onClick={() => setShow(false)}>Cancel</button></div>
       <form onSubmit={submit}>
         <div className="form-group"><label>Title</label><input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="One-line idea…" /></div>
-        <div className="form-group"><label>Description</label><textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="As much or as little as needed…" /></div>
+        <div className="form-group">
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Description
+            <button type="button" onClick={toggleDictation} title={dictating ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictating ? 'var(--red, #ef4444)' : 'inherit', opacity: dictating ? 1 : 0.5 }}>{dictating ? '⏹ stop' : '🎤'}</button>
+          </label>
+          <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="As much or as little as needed…" />
+        </div>
         <div className="form-row">
           <div className="form-group"><label>Origin</label><select value={form.origin} onChange={e => setForm(f => ({ ...f, origin: e.target.value }))}>{ORIGINS.map(o => <option key={o}>{o}</option>)}</select></div>
           <div className="form-group"><label>Category</label><select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>

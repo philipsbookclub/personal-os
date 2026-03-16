@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../lib/api'
+import { useDictation } from '../../../hooks/useDictation'
 
 const GENRES = ['classic', 'nonfiction', 'business', 'other']
 
@@ -86,6 +87,9 @@ function DailyLog() {
   useEffect(() => { load() }, [])
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const { listening: dictating, toggle: toggleDictation } = useDictation(
+    t => setForm(f => ({ ...f, keyTakeaway: f.keyTakeaway + (f.keyTakeaway ? ' ' : '') + t }))
+  )
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
     try {
@@ -110,7 +114,13 @@ function DailyLog() {
           </div>
           <div className="form-group"><label>Pages Read</label><input type="number" value={form.pagesRead} onChange={e => set('pagesRead', e.target.value)} placeholder="0" /></div>
         </div>
-        <div className="form-group"><label>Key Takeaway</label><textarea value={form.keyTakeaway} onChange={e => set('keyTakeaway', e.target.value)} placeholder="What was the one idea that stuck?" /></div>
+        <div className="form-group">
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Key Takeaway
+            <button type="button" onClick={toggleDictation} title={dictating ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictating ? 'var(--red, #ef4444)' : 'inherit', opacity: dictating ? 1 : 0.5 }}>{dictating ? '⏹ stop' : '🎤'}</button>
+          </label>
+          <textarea value={form.keyTakeaway} onChange={e => set('keyTakeaway', e.target.value)} placeholder="What was the one idea that stuck?" />
+        </div>
         <div className="form-group"><label>Applied To</label><input value={form.appliedTo} onChange={e => set('appliedTo', e.target.value)} placeholder="Did this connect to Magister, UGOA, or a current problem?" /></div>
         <div className="form-group"><label>Quote</label><input value={form.quote} onChange={e => set('quote', e.target.value)} placeholder="Notable quote…" /></div>
         <button className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving…' : 'Save'}</button>

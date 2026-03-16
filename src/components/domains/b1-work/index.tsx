@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../lib/api'
+import { useDictation } from '../../../hooks/useDictation'
 
 const MODES = ['depth', 'breadth', 'exploration', 'management']
 const PRIORITIES = ['urgent', 'important', 'normal', 'explore']
@@ -72,6 +73,9 @@ function DailyLog() {
   useEffect(() => { load() }, [])
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const { listening: dictating, toggle: toggleDictation } = useDictation(
+    t => setForm(f => ({ ...f, text: f.text + (f.text ? ' ' : '') + t }))
+  )
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSubmitting(true)
     try {
@@ -98,7 +102,13 @@ function DailyLog() {
           <div className="form-group"><label>Hours</label><input type="number" value={form.hoursLogged} onChange={e => set('hoursLogged', e.target.value)} placeholder="0" min={0} max={24} step={0.5} /></div>
           <div className="form-group"><label>Energy (1–10)</label><input type="number" value={form.energy} onChange={e => set('energy', +e.target.value)} min={1} max={10} /></div>
         </div>
-        <div className="form-group"><label>Log</label><textarea value={form.text} onChange={e => set('text', e.target.value)} placeholder="Describe your work day…" required /></div>
+        <div className="form-group">
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Log
+            <button type="button" onClick={toggleDictation} title={dictating ? 'Stop dictation' : 'Dictate'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, color: dictating ? 'var(--red, #ef4444)' : 'inherit', opacity: dictating ? 1 : 0.5 }}>{dictating ? '⏹ stop' : '🎤'}</button>
+          </label>
+          <textarea value={form.text} onChange={e => set('text', e.target.value)} placeholder="Describe your work day…" required />
+        </div>
         <div className="form-row">
           <div className="form-group"><label>Value Created</label><input value={form.valueCreated} onChange={e => set('valueCreated', e.target.value)} placeholder="e.g. $12k app submitted" /></div>
           <div className="form-group"><label>Producer Interactions</label><input type="number" value={form.producerInteractions} onChange={e => set('producerInteractions', +e.target.value)} min={0} /></div>
