@@ -105,7 +105,7 @@ export default function App() {
   const [mobileSynthOpen, setMobileSynthOpen] = useState(false)
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <div className={`app-layout${panelOpen ? ' panel-open' : ' panel-closed'}`}>
         <Sidebar />
         <MobileHeader onSynthesis={() => setMobileSynthOpen(v => !v)} />

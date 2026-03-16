@@ -8,6 +8,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Restore path from GitHub Pages 404 redirect
+      (function() {
+        var p = window.location.search.slice(1).split('&').filter(function(s) { return s.startsWith('p='); })[0];
+        if (p) { window.history.replaceState(null, null, '/' + decodeURIComponent(p.slice(2))); }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
