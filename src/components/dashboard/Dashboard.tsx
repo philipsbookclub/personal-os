@@ -12,29 +12,13 @@ const BUCKETS = [
 ]
 
 export default function Dashboard() {
-  const [week, setWeek]         = useState<any>(null)
-  const [month, setMonth]       = useState<any>(null)
-  const [crossReport, setCrossReport]   = useState<any>(null)
-  const [crossReports, setCrossReports] = useState<any[]>([])
-  const [generating, setGenerating]     = useState(false)
+  const [week, setWeek]   = useState<any>(null)
+  const [month, setMonth] = useState<any>(null)
 
   useEffect(() => {
     api.week.get().then(setWeek)
     api.month.get().then(setMonth)
-    api.cross.get().then((r: any) => {
-      if (Array.isArray(r) && r.length > 0) { setCrossReports(r); setCrossReport(r[0]) }
-    })
   }, [])
-
-  const generateCross = async () => {
-    setGenerating(true)
-    try {
-      const r = await api.cross.generate() as any
-      setCrossReport(r)
-      const updated = await api.cross.get() as any[]
-      setCrossReports(updated)
-    } finally { setGenerating(false) }
-  }
 
   return (
     <div>
@@ -45,9 +29,6 @@ export default function Dashboard() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <button className="btn btn-primary" onClick={generateCross} disabled={generating}>
-          {generating ? <><span className="spinner" />&nbsp;Synthesizing…</> : '⚡ Cross-Bucket Report'}
-        </button>
       </div>
 
       {(week?.theme || month?.theme) && (
@@ -77,34 +58,13 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+      <div className="bucket-grid">
         {BUCKETS.map(b => (
-          <a key={b.id} href={b.path} className="card" style={{ textAlign: 'center', textDecoration: 'none', padding: '0.75rem 0.5rem' }}>
-            <div style={{ fontSize: '1.4rem', marginBottom: '0.25rem' }}>{b.icon}</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{b.label}</div>
+          <a key={b.id} href={b.path} className="card bucket-card">
+            <div className="bucket-card-icon">{b.icon}</div>
+            <div className="bucket-card-label">{b.label}</div>
           </a>
         ))}
-      </div>
-
-      <div className="card">
-        <div className="flex-between mb-md">
-          <h2>Cross-Bucket Synthesis</h2>
-          {crossReports.length > 1 && (
-            <div className="tag-row">
-              {crossReports.slice(0, 4).map((r: any) => (
-                <button key={r.id} className={`btn btn-sm ${crossReport?.id === r.id ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setCrossReport(r)}>{r.weekOf}</button>
-              ))}
-            </div>
-          )}
-        </div>
-        {crossReport
-          ? <div className="report-content">{crossReport.content}</div>
-          : (
-            <div className="empty-state">
-              Generate your first cross-bucket synthesis report above.<br /><br />
-              This report uses all 7 bucket weekly reports as input and surfaces patterns you can&apos;t see from inside any single bucket.
-            </div>
-          )}
       </div>
     </div>
   )

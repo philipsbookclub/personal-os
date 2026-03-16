@@ -186,3 +186,152 @@ label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0
 
 input[type="number"] { -moz-appearance: textfield; }
 input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* ── Sidebar footer (planning links) ─────────────────────────────────────── */
+.sidebar-footer { margin-top: auto; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+
+/* ── Bucket grid (dashboard) ─────────────────────────────────────────────── */
+.bucket-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+.bucket-card {
+  text-align: center;
+  text-decoration: none;
+  padding: 0.75rem 0.5rem;
+  transition: background 0.15s;
+}
+.bucket-card:hover { background: var(--surface2); }
+.bucket-card-icon  { font-size: 1.4rem; margin-bottom: 0.25rem; }
+.bucket-card-label { font-size: 0.7rem; color: var(--muted); }
+
+/* ── Right panel ─────────────────────────────────────────────────────────── */
+.right-panel {
+  width: 300px;
+  min-height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  overflow-y: auto;
+  padding: 1.5rem 1.25rem;
+  transition: transform 0.2s ease;
+  z-index: 50;
+}
+.right-panel.closed { transform: translateX(300px); }
+
+.panel-open  .main-content { margin-right: 300px; max-width: calc(100vw - 220px - 300px); }
+.panel-closed .main-content { margin-right: 0; }
+
+.panel-toggle {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 48px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  z-index: 51;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: right 0.2s ease;
+  font-family: var(--font);
+}
+.panel-toggle.is-open { right: 300px; }
+
+/* ── Mobile header (hidden on desktop) ───────────────────────────────────── */
+.mobile-header { display: none; }
+
+/* ── Bottom nav (hidden on desktop) ─────────────────────────────────────── */
+.bottom-nav { display: none; }
+
+/* ── Mobile breakpoint ───────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar      { display: none; }
+  .right-panel  { display: none; }
+  .panel-toggle { display: none; }
+
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1rem;
+    z-index: 100;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100vw !important;
+    padding: 1rem;
+    padding-top: calc(52px + 1rem);
+    padding-bottom: calc(64px + 1rem);
+  }
+
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 64px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+  }
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .bottom-nav-item.active { color: var(--accent); }
+  .bottom-nav-icon  { font-size: 1.25rem; line-height: 1; }
+  .bottom-nav-label { font-size: 0.55rem; }
+
+  /* Mobile synthesis sheet */
+  .mobile-synth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+  }
+  .mobile-synth-drawer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-radius: 12px 12px 0 0;
+    padding: 1.25rem;
+    width: 100%;
+    max-height: 78vh;
+    overflow-y: auto;
+  }
+
+  /* Layout overrides */
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .form-row { flex-direction: column; gap: 0; }
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .tabs { overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; padding-bottom: 0; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { white-space: nowrap; }
+  .bucket-grid { grid-template-columns: repeat(4, 1fr); }
+}
