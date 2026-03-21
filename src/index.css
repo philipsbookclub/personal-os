@@ -45,6 +45,7 @@ a { color: var(--accent); text-decoration: none; }
   position: fixed;
   top: 0; left: 0; bottom: 0;
   overflow-y: auto;
+  z-index: 10;
 }
 
 .sidebar-logo {
