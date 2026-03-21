@@ -312,7 +312,7 @@ export default function B2Build() {
       {/* Hidden video source */}
       <video
         ref={videoRef}
-        src="/chess-dust-trial.mp4"
+        src={`${import.meta.env.BASE_URL}chess-dust-trial.mp4`}
         preload="auto"
         muted
         playsInline
