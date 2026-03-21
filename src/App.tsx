@@ -13,6 +13,60 @@ import B5Social         from './components/domains/b5-social'
 import B6Connections    from './components/domains/b6-connections'
 import B7IdeaLab        from './components/domains/b7-idealab'
 
+const SESSION_KEY = 'pos_auth'
+const PASSWORD    = '777'
+
+function LoginScreen({ onAuth }: { onAuth: () => void }) {
+  const [value, setValue] = useState('')
+  const [error, setError] = useState(false)
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (value === PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, '1')
+      onAuth()
+    } else {
+      setError(true)
+      setValue('')
+    }
+  }
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '100vh', background: 'var(--bg, #0f0f0f)',
+    }}>
+      <form onSubmit={handleSubmit} style={{
+        display: 'flex', flexDirection: 'column', gap: '1rem',
+        background: 'var(--surface, #1a1a1a)', padding: '2rem',
+        borderRadius: '0.75rem', width: '260px',
+        border: '1px solid var(--border, #2a2a2a)',
+      }}>
+        <div style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--text, #fff)' }}>Personal OS</div>
+        <input
+          type="password"
+          placeholder="Password"
+          value={value}
+          onChange={e => { setValue(e.target.value); setError(false) }}
+          autoFocus
+          style={{
+            padding: '0.6rem 0.75rem', borderRadius: '0.4rem',
+            border: `1px solid ${error ? '#e55' : 'var(--border, #333)'}`,
+            background: 'var(--bg, #0f0f0f)', color: 'var(--text, #fff)',
+            fontSize: '1rem', outline: 'none',
+          }}
+        />
+        {error && <div style={{ color: '#e55', fontSize: '0.8rem' }}>Incorrect password</div>}
+        <button type="submit" style={{
+          padding: '0.6rem', borderRadius: '0.4rem', border: 'none',
+          background: 'var(--accent, #6c63ff)', color: '#fff',
+          fontWeight: 600, cursor: 'pointer', fontSize: '0.95rem',
+        }}>Enter</button>
+      </form>
+    </div>
+  )
+}
+
 const BUCKETS = [
   { label: 'Work',        short: 'Work',  path: '/b1', icon: '💼' },
   { label: 'Build',       short: 'Build', path: '/b2', icon: '🔧' },
@@ -101,8 +155,11 @@ function BottomNav() {
 }
 
 export default function App() {
-  const [panelOpen, setPanelOpen]           = useState(true)
+  const [authed, setAuthed]                   = useState(() => sessionStorage.getItem(SESSION_KEY) === '1')
+  const [panelOpen, setPanelOpen]             = useState(true)
   const [mobileSynthOpen, setMobileSynthOpen] = useState(false)
+
+  if (!authed) return <LoginScreen onAuth={() => setAuthed(true)} />
 
   return (
     <HashRouter>
