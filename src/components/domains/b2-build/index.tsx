@@ -270,40 +270,43 @@ export default function B2Build() {
 
     const ctx = canvas.getContext('2d')!
 
-    // Match canvas pixel dimensions to the viewport
+    const draw = () => {
+      if (video.readyState >= 2) ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+    }
+
     const resize = () => {
       canvas.width  = window.innerWidth
       canvas.height = window.innerHeight
+      draw()
     }
     resize()
     window.addEventListener('resize', resize, { passive: true })
 
-    // rAF render loop — draws the current video frame every tick
-    let rafId: number
-    const render = () => {
-      if (video.readyState >= 2) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-      }
-      rafId = requestAnimationFrame(render)
-    }
-    rafId = requestAnimationFrame(render)
+    // Draw only when a new frame is actually ready — no continuous loop
+    video.addEventListener('seeked',      draw)
+    video.addEventListener('loadeddata',  draw)
 
-    // Scrub video on window scroll
+    // Throttle scroll to one seek per animation frame
+    let rafPending = false
     const onScroll = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight
-      if (!max) return
-      const p = Math.max(0, Math.min(1, window.scrollY / max))
-      setProgress(p)
-      if (video.duration && isFinite(video.duration)) {
-        video.currentTime = p * video.duration
-      }
+      if (rafPending) return
+      rafPending = true
+      requestAnimationFrame(() => {
+        rafPending = false
+        const max = document.documentElement.scrollHeight - window.innerHeight
+        if (!max) return
+        const p = Math.max(0, Math.min(1, window.scrollY / max))
+        setProgress(p)
+        if (video.duration && isFinite(video.duration)) video.currentTime = p * video.duration
+      })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
 
     return () => {
-      cancelAnimationFrame(rafId)
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', onScroll)
+      video.removeEventListener('seeked',     draw)
+      video.removeEventListener('loadeddata', draw)
     }
   }, [])
 
